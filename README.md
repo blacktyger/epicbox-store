@@ -37,7 +37,8 @@ owner's signature over a fresh challenge, or acknowledge a message on the owner'
   - for owners: `post`, `claim`, `pull_owned`, `made_owned`;
   - for wallets with signatures: `pull`, `pull_many`, `made`;
   - for front-ends: `pull_outbound`, `outbound_done`;
-  - for controllers: `add_poster`, `remove_poster`, `set_local_domains`;
+  - for operators (and controllers): `add_poster`, `add_local_domain`;
+  - for controllers only: `remove_poster`, `set_local_domains`, `set_operators`;
   - `stats`.
 
   `post` is open to approved front-ends and canisters (`posters`).
@@ -96,6 +97,10 @@ wallets produce.
 While the store is young it has one controller, BT Labs. The plan is a multi-approval controller,
 under which no upgrade happens without both parties' approval, and frozen code (no controller) once
 it has stopped changing. The controllers are always visible with the command above.
+
+Routine, additive settings (adding a poster or a local domain) are open to `operators`, so they do
+not need the approvals. Removing a poster, replacing the domain list and changing the operators
+stay with the controllers.
 
 ## Licence
 

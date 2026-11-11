@@ -49,6 +49,9 @@ service : {
   add_poster : (principal) -> (variant { Ok; Err : text });
   remove_poster : (principal) -> (variant { Ok; Err : text });
   posters : () -> (vec principal) query;
+  add_local_domain : (domain : text) -> (variant { Ok : text; Err : text });
+  set_operators : (vec principal) -> (variant { Ok; Err : text });
+  operators : () -> (vec principal) query;
   pull_outbound : (limit : nat32) -> (variant { Ok : vec Outbound; Err : text }) query;
   outbound_done : (delivered : vec text, failed : vec ForwardFailure) -> (variant { Ok : record { nat32; nat32 }; Err : text });
   set_local_domains : (vec text) -> (variant { Ok; Err : text });

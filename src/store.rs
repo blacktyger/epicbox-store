@@ -139,6 +139,9 @@ pub struct State {
     pub counters_extra: Option<CountersExtra>,
     /// HTTPS posts per sender key in the current hour: (window start, count).
     pub http_rate: Option<BTreeMap<String, (u64, u32)>>,
+    /// Principals allowed the routine, additive settings: adding a poster or a local domain.
+    /// Removing either, and changing this list, stay with the controllers.
+    pub operators: Option<BTreeSet<Principal>>,
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
@@ -513,6 +516,21 @@ impl State {
         (removed, dropped)
     }
 
+    /// Whether `who` may make an additive settings change: a controller or an operator.
+    pub fn may_operate(&self, who: &Principal, is_controller: bool) -> bool {
+        is_controller || self.operators.as_ref().is_some_and(|o| o.contains(who))
+    }
+
+    /// Adds `domain` (as `host` or `host:port`) to the domains this store answers for.
+    pub fn add_local_domain(&mut self, domain: &str) -> String {
+        let name = match domain.rsplit_once(':') {
+            Some((host, port)) => relay_name(host, port.parse().ok()),
+            None => relay_name(domain, None),
+        };
+        self.local_domains.insert(name.clone());
+        name
+    }
+
     pub fn stats_view(&self) -> StatsView {
         StatsView {
             messages: self.messages.len() as u64,
@@ -701,6 +719,20 @@ mod tests {
         assert_eq!(s.post(slate, Principal::anonymous(), T0 + 120).unwrap(), id);
         assert!(s.messages.is_empty());
         assert_eq!(s.counters_extra.as_ref().unwrap().duplicates, 2);
+    }
+
+    #[test]
+    fn operators_may_only_add() {
+        let (op, other) = (Principal::from_slice(&[1; 10]), Principal::from_slice(&[2; 10]));
+        let mut s = State::default();
+        assert!(!s.may_operate(&op, false));
+        assert!(s.may_operate(&other, true), "a controller always may");
+        s.operators = Some([op].into_iter().collect());
+        assert!(s.may_operate(&op, false));
+        assert!(!s.may_operate(&other, false));
+        assert_eq!(s.add_local_domain("Relay.Example.org"), "relay.example.org:443");
+        assert_eq!(s.add_local_domain("relay.example.org:8443"), "relay.example.org:8443");
+        assert_eq!(s.local_domains.len(), 2);
     }
 
     #[test]

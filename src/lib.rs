@@ -74,6 +74,17 @@ fn require_controller() -> Result<(), String> {
     if ic_cdk::api::is_controller(&caller()) { Ok(()) } else { Err("controllers only".into()) }
 }
 
+/// Additive settings: a controller or an operator.
+fn require_operator() -> Result<(), String> {
+    let who = caller();
+    let controller = ic_cdk::api::is_controller(&who);
+    if STATE.with(|s| s.borrow().may_operate(&who, controller)) {
+        Ok(())
+    } else {
+        Err("controllers or operators only".into())
+    }
+}
+
 /// Posts a message. Callers: front-ends and canisters on the poster list, or a controller.
 #[ic_cdk::update]
 fn post(slate: PostSlate) -> Result<String, String> {
@@ -181,7 +192,7 @@ fn http_request_update(req: HttpRequest) -> HttpResponse {
 
 #[ic_cdk::update]
 fn add_poster(p: Principal) -> Result<(), String> {
-    require_controller()?;
+    require_operator()?;
     STATE.with(|s| s.borrow_mut().posters.insert(p));
     Ok(())
 }
@@ -196,6 +207,27 @@ fn remove_poster(p: Principal) -> Result<(), String> {
 #[ic_cdk::query]
 fn posters() -> Vec<Principal> {
     STATE.with(|s| s.borrow().posters.iter().copied().collect())
+}
+
+/// Adds one domain this store answers for. Controllers or operators; replacing the whole list
+/// (`set_local_domains`) stays with the controllers.
+#[ic_cdk::update]
+fn add_local_domain(domain: String) -> Result<String, String> {
+    require_operator()?;
+    Ok(STATE.with(|s| s.borrow_mut().add_local_domain(&domain)))
+}
+
+/// Replaces the operator list. Controllers only.
+#[ic_cdk::update]
+fn set_operators(operators: Vec<Principal>) -> Result<(), String> {
+    require_controller()?;
+    STATE.with(|s| s.borrow_mut().operators = Some(operators.into_iter().collect()));
+    Ok(())
+}
+
+#[ic_cdk::query]
+fn operators() -> Vec<Principal> {
+    STATE.with(|s| s.borrow().operators.iter().flatten().copied().collect())
 }
 
 #[ic_cdk::pre_upgrade]
