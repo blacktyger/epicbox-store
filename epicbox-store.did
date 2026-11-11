@@ -1,0 +1,56 @@
+type PostSlate = record { from : text; to : text; str : text; signature : text };
+type SignedPull = record { address : text; challenge : text; signature : text };
+type SignedMade = record { address : text; epicboxmsgid : text; signature : text };
+type OwnerPull = record { address : text; limit : nat32 };
+type Delivery = record {
+  epicboxmsgid : text;
+  from : text;
+  str : text;
+  signature : text;
+  posted_ns : nat64;
+};
+type Counters = record {
+  posted : nat64;
+  made : nat64;
+  expired : nat64;
+  refused : nat64;
+  forwarded : nat64;
+  forward_failed : nat64;
+};
+type Outbound = record {
+  id : text;
+  relay : text;
+  from : text;
+  to : text;
+  str : text;
+  signature : text;
+  attempts : nat32;
+};
+type ForwardFailure = record { id : text; error : text };
+type StatsView = record {
+  messages : nat64;
+  queues : nat64;
+  bytes : nat64;
+  owners : nat64;
+  posters : nat64;
+  outbound : nat64;
+  local_domains : vec text;
+  counters : Counters;
+};
+service : {
+  post : (PostSlate) -> (variant { Ok : text; Err : text });
+  pull : (SignedPull) -> (variant { Ok : opt Delivery; Err : text }) query;
+  pull_many : (vec SignedPull, nat32) -> (vec variant { Ok : vec Delivery; Err : text }) query;
+  made : (SignedMade) -> (variant { Ok; Err : text });
+  claim : (address : text, signature : text) -> (variant { Ok; Err : text });
+  pull_owned : (OwnerPull) -> (variant { Ok : vec Delivery; Err : text }) query;
+  made_owned : (address : text, ids : vec text) -> (variant { Ok : nat32; Err : text });
+  stats : () -> (StatsView) query;
+  add_poster : (principal) -> (variant { Ok; Err : text });
+  remove_poster : (principal) -> (variant { Ok; Err : text });
+  posters : () -> (vec principal) query;
+  pull_outbound : (limit : nat32) -> (variant { Ok : vec Outbound; Err : text }) query;
+  outbound_done : (delivered : vec text, failed : vec ForwardFailure) -> (variant { Ok : record { nat32; nat32 }; Err : text });
+  set_local_domains : (vec text) -> (variant { Ok; Err : text });
+  http_request : (record { method : text; url : text; headers : vec record { text; text }; body : blob }) -> (record { status_code : nat16; headers : vec record { text; text }; body : blob }) query;
+}

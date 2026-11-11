@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "area": "epicbox",
+  "name": "address_invalid_scheme",
+  "generator": "conformance/vectors/epicbox",
+  "upstream": {
+    "repo": "https://github.com/EpicCash/epic-wallet",
+    "commit": "845b3fcf4df12ed0139929c62157015447a9d063"
+  },
+  "inputs": {
+    "network": "mainnet",
+    "text": "https://esYTimgooNuxKXdEEXJk3fbXoy2HWyyY2CaRXYU8Z8B7fSPyz6YL"
+  },
+  "expected": {
+    "accepted": false
+  }
+}

@@ -1,0 +1,5 @@
+epicbox-store
+Copyright 2026 BT Labs
+
+The Epicbox test vectors in testdata/epicbox/ are from LEPIC
+(https://github.com/BTLabsUK/lepic), licensed under the Apache License 2.0.

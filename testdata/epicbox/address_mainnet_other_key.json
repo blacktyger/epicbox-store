@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "area": "epicbox",
+  "name": "address_mainnet_other_key",
+  "generator": "conformance/vectors/epicbox",
+  "upstream": {
+    "repo": "https://github.com/EpicCash/epic-wallet",
+    "commit": "845b3fcf4df12ed0139929c62157015447a9d063"
+  },
+  "inputs": {
+    "network": "mainnet",
+    "text": "esWtu4BwqC58U5YtffP4sVJ7SWV88uYdn3okpEdiv1dFHnYMh6oj"
+  },
+  "expected": {
+    "accepted": true,
+    "public_key": "esWtu4BwqC58U5YtffP4sVJ7SWV88uYdn3okpEdiv1dFHnYMh6oj",
+    "public_key_hex": "024d4b6cd1361032ca9bd2aeb9d900aa4d45d9ead80ac9423374c451a7254d0766",
+    "domain": "epicbox.epiccash.com",
+    "port": null,
+    "display": "esWtu4BwqC58U5YtffP4sVJ7SWV88uYdn3okpEdiv1dFHnYMh6oj@epicbox.epiccash.com",
+    "json": "{\"public_key\":\"esWtu4BwqC58U5YtffP4sVJ7SWV88uYdn3okpEdiv1dFHnYMh6oj\",\"domain\":\"epicbox.epiccash.com\",\"port\":null}"
+  }
+}
